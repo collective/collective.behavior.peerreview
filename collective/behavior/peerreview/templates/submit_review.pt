@@ -1,0 +1,23 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      i18n:domain="plone"
+      metal:use-macro="context/main_template/macros/master">
+
+  <metal:block fill-slot="main">
+    <div id="content-core" tal:condition="view/is_review_in_progress">
+      <tal:reviewer condition="view/is_reviewer">
+        <metal:block use-macro="context/@@ploneform-macros/titlelessform" />
+      </tal:reviewer>
+      <tal:reviewer condition="not:view/is_reviewer">
+        <p>TODO: describe there is no reviewer.</p>
+      </tal:reviewer>
+    </div>
+    <div id="content-core" tal:condition="not:view/is_review_in_progress">
+      <p>TODO: describe that review is not yet in progress</p>
+    </div>
+
+  </metal:block>
+
+</html>

@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<registry>
+
+  <record name="collective.behavior.peerreview.enter">
+    <field type="plone.registry.field.Dict">
+      <title>Enter transition per workflow</title>
+      <key_type type="plone.registry.field.Choice">
+        <title>Workflow</title>
+        <vocabulary>plone.app.vocabularies.Workflows</vocabulary>
+      </key_type>
+      <value_type type="plone.registry.field.Choice">
+        <title>Transition</title>
+        <vocabulary>plone.app.vocabularies.WorkflowTransitions</vocabulary>
+      </value_type>
+    </field>
+    <value>
+      <element key="simple_publication_workflow">submit</element>
+    </value>
+  </record>
+
+  <record name="collective.behavior.peerreview.exit">
+    <field type="plone.registry.field.Dict">
+      <title>Exit transition per workflow</title>
+      <key_type type="plone.registry.field.Choice">
+        <title>Workflow</title>
+        <vocabulary>plone.app.vocabularies.Workflows</vocabulary>
+      </key_type>
+      <value_type type="plone.registry.field.Choice">
+        <title>Transition</title>
+        <vocabulary>plone.app.vocabularies.WorkflowTransitions</vocabulary>
+      </value_type>
+    </field>
+    <value>
+      <element key="simple_publication_workflow">publish</element>
+    </value>
+  </record>
+
+  <record name="collective.behavior.peerreview.emails.subject">
+    <field type="plone.registry.field.Dict">
+      <title>Email bodies templates</title>
+      <key_type type="plone.registry.field.TextLine">
+        <title>Template ID</title>
+      </key_type>
+      <value_type type="plone.registry.field.TextLine">
+        <title>Template</title>
+      </value_type>
+    </field>
+    <value>
+      <element key="review_started_notify_reviewers">Review needed for "{context_title}"</element>
+      <element key="review_ended_notify_owner">Review done for "{context_title}"</element>
+    </value>
+  </record>
+
+  <record name="collective.behavior.peerreview.emails.body">
+    <field type="plone.registry.field.Dict">
+      <title>Email bodies templates</title>
+      <key_type type="plone.registry.field.TextLine">
+        <title>Template ID</title>
+      </key_type>
+      <value_type type="plone.registry.field.Text">
+        <title>Template</title>
+      </value_type>
+    </field>
+    <value>
+      <element key="review_started_notify_reviewers">
+Hi {recipient_fullname}!
+
+You've been selected to review "{context_title}". Once you read the document
+please go to link bellow and submit your review:
+{context_url}/@@submit-review?form.widgets.reviewer={recipient_username}
+      </element>
+      <element key="review_ended_notify_owner">
+Hi {recipient_fullname}!
+
+Review process of "{context_title}" has been completed. You can see review
+score at:
+{context_url}
+      </element>
+    </value>
+  </record>
+</registry>

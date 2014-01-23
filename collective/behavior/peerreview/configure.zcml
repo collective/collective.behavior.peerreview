@@ -1,0 +1,72 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:zcml="http://namespaces.zope.org/zcml"
+    xmlns:i18n="http://namespaces.zope.org/i18n"
+    xmlns:plone="http://namespaces.plone.org/plone"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    i18n_domain="collective.behavior.peerreview">
+
+    <include package="plone.behavior" file="meta.zcml" />
+    <include package="plone.app.widgets" />
+
+    <interface interface=".subscribers.IReviewInProgress" />
+
+    <permission
+        id="collective.behavior.peerreview.ManageReviewers"
+        title="collective.behavior.peerreview: Manage Reviewers"
+        />
+
+    <permission
+        id="collective.behavior.peerreview.SubmitReview"
+        title="collective.behavior.peerreview: Submit Review"
+        />
+
+    <plone:behavior
+        title="Reviewers"
+        description="TODO: add description"
+        provides=".behaviors.IReviewers"
+        factory=".behaviors.Reviewers"
+        marker=".behaviors.IReviewersMarker"
+        />
+
+    <plone:behavior
+        title="Master reviewer"
+        description="TODO: add description"
+        provides=".behaviors.IMasterReviewer"
+        factory=".behaviors.MasterReviewer"
+        marker=".behaviors.IMasterReviewerMarker"
+        />
+
+    <subscriber
+        for=".behaviors.IReviewersMarker
+             Products.CMFCore.interfaces.IActionSucceededEvent"
+        handler=".subscribers.notify_reviewers"
+        />
+
+    <browser:page
+        for=".behaviors.IReviewersMarker"
+        name="submit-review"
+        class=".form.SubmitReview"
+        permission="collective.behavior.peerreview.SubmitReview"
+        />
+
+    <!-- TODO: solve all todo's in code -->
+    <!-- TODO: viewlet for status of reviews -->
+
+    <!-- TODO: my reviews: should it be in dashboard? -->
+    <!-- TODO: all reviews page -->
+    <!-- TODO: cofiglet (workflow <-> enter/exit transition) -->
+    <!-- TODO: cofiglet (email templates) -->
+    <!-- TODO: unit tests -->
+    <!-- TODO: selenium tests -->
+
+    <genericsetup:registerProfile
+        name="default"
+        title="Peer Review Dexterity behaviour"
+        directory="profiles/default"
+        description="TODO: add description"
+        provides="Products.GenericSetup.interfaces.EXTENSION"
+        />
+
+</configure>

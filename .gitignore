@@ -1,0 +1,3 @@
+*.pyc
+
+/collective.behavior.peerreview.egg-info/
