@@ -24,7 +24,7 @@
 
     <plone:behavior
         title="Reviewers"
-        description="TODO: add description"
+        description="Behavior which enables peer review process."
         provides=".behaviors.IReviewers"
         factory=".behaviors.Reviewers"
         marker=".behaviors.IReviewersMarker"
@@ -32,7 +32,7 @@
 
     <plone:behavior
         title="Master reviewer"
-        description="TODO: add description"
+        description="Extension of 'Reviewers' behavior which enables one master reviewer which submits review at the end."
         provides=".behaviors.IMasterReviewer"
         factory=".behaviors.MasterReviewer"
         marker=".behaviors.IMasterReviewerMarker"
@@ -51,7 +51,6 @@
         permission="collective.behavior.peerreview.SubmitReview"
         />
 
-    <!-- TODO: solve all todo's in code -->
     <!-- TODO: viewlet for status of reviews -->
 
     <!-- TODO: my reviews: should it be in dashboard? -->
@@ -65,7 +64,7 @@
         name="default"
         title="Peer Review Dexterity behaviour"
         directory="profiles/default"
-        description="TODO: add description"
+        description="Allows to peer-review any content in Plone"
         provides="Products.GenericSetup.interfaces.EXTENSION"
         />
 

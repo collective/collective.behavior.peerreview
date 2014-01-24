@@ -11,11 +11,17 @@
         <metal:block use-macro="context/@@ploneform-macros/titlelessform" />
       </tal:reviewer>
       <tal:reviewer condition="not:view/is_reviewer">
-        <p>TODO: describe there is no reviewer.</p>
+        <dl class="portalMessage error">
+            <dt>Error</dt>
+            <dd>Wrong url. Check if you pasted the link correctly.</dd>
+        </dl>
       </tal:reviewer>
     </div>
     <div id="content-core" tal:condition="not:view/is_review_in_progress">
-      <p>TODO: describe that review is not yet in progress</p>
+      <dl class="portalMessage error">
+          <dt>Error</dt>
+          <dd>Review process is not started yet.</dd>
+      </dl>
     </div>
 
   </metal:block>
