@@ -6,7 +6,7 @@ version = '0.0.1'
 setup(
     name='collective.behavior.peerreview',
     version=version,
-    description="Provide flexible review process for any Plone content type.",
+    description="Provide peer review process for any Plone content type.",
     long_description=(
         open("README.rst").read() + "\n" +
         open("CHANGES.rst").read(),
@@ -19,7 +19,7 @@ setup(
     author='Rok Garbas',
     author_email='rok@garbas.si',
     url='https://github.com/collective/collective.behavior.peerreview',
-    license='XXX',  # TODO: which license
+    license='GPL',
     packages=find_packages(exclude=['ez_setup']),
     namespace_packages=['collective', 'collective.behavior'],
     include_package_data=True,
