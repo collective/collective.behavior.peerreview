@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+ <rolemap>
+   <permissions>
+     <permission name="collective.behavior.peerreview: Submit Review" acquire="False">
+       <role name="Reader"/>
+     </permission>
+     <permission name="collective.behavior.peerreview: Manage Reviewers" acquire="False">
+       <role name="Editor"/>
+       <role name="Owner"/>
+       <role name="Manager"/>
+       <role name="Site Administrator"/>
+     </permission>
+   </permissions>
+ </rolemap>
+
+

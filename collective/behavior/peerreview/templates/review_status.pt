@@ -1,0 +1,21 @@
+<div>
+
+  <tal:owner condition="view/is_owner">
+    <h2>Reviews by:</h2>
+    <p>TODO: show status if review process is done</p>
+    <ul tal:condition="view/reviews">
+      <li tal:repeat="reviewer view/reviews">
+        <a tal:attributes="href string:#${reviewer}"
+           tal:content="reviewer">Reviewer</a>
+        <div tal:content="structure python:view.reviews[reviewer]['review']">
+          Review
+        </div>
+      </li>
+    </ul>
+  </tal:owner>
+
+  <tal:reviewer condition="python: view.is_reviewer">
+    <a href="#" tal:attributes="href view/submit_review_url">Submit review</a>
+  </tal:reviewer>
+
+</div>

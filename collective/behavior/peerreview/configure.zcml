@@ -44,21 +44,50 @@
         handler=".subscribers.notify_reviewers"
         />
 
+    <browser:viewlet
+        name="collective.behavior.peerreview.status"
+        for=".behaviors.IReviewersMarker"
+        class=".viewlets.ReviewStatus"
+        permission="zope2.View"
+        manager="plone.app.layout.viewlets.interfaces.IAboveContentBody"
+        />
+
     <browser:page
         for=".behaviors.IReviewersMarker"
         name="submit-review"
-        class=".form.SubmitReview"
+        class=".forms.SubmitReview"
         permission="collective.behavior.peerreview.SubmitReview"
         />
 
-    <!-- TODO: viewlet for status of reviews -->
+    <!-- TODO: get reviewer from current logged user -->
+    <!-- TODO: anybody with ManageReviewers permission can see viewlet -->
 
+    <!-- TODO: configurable visibility/anonimity of peer reviewer and owner -->
     <!-- TODO: my reviews: should it be in dashboard? -->
-    <!-- TODO: all reviews page -->
+    <!-- TODO: all reviews page: where should we place it? -->
     <!-- TODO: cofiglet (workflow <-> enter/exit transition) -->
     <!-- TODO: cofiglet (email templates) -->
+
+    <!-- QUESTIONS:
+          - should it possible to save review and submit it later? yes
+          - auto-assign reviewers or manually first?
+      -->
+
+    <!-- TODO: master reviewer => lead reviewer
+               review reviewer
+               reviewers => peer reviewers
+         TODO: Master reviewer should be possible to retract the document review
+         TODO: Master reviewer and reviewers should be enable to discuss
+         TODO: Master reviewer should be possible to complete button
+         TODO: Possible to "Save without Submit", "Submit", "Cancel"
+         TODO: Master reviewer group per workflow
+         TODO: Reviewers group per workflow to select 
+      -->
+
     <!-- TODO: unit tests -->
     <!-- TODO: selenium tests -->
+    <!-- TODO: prepare transition -->
+    <!-- TODO: self review possibility -->
 
     <genericsetup:registerProfile
         name="default"

@@ -25,16 +25,6 @@ SUBMIT_REVIEW_KEY = 'collective.behaviour.peerreview.forms.SubmitReview'
 
 class ISubmitReview(model.Schema):
 
-    form.mode(reviewer='hidden')
-    reviewer = schema.TextLine(
-        title=_(u'label_reviewer', u'Reviewer'),
-        description=_(
-            u'help_reviewer',
-            default=u'Person submitting review.'
-        ),
-        required=True,
-    )
-
     form.widget('review', TinyMCEWidget)
     review = schema.Text(
         title=_(u'label_review', u'Review'),
@@ -50,7 +40,6 @@ class SubmitReview(AutoExtensibleForm, Form):
 
     template = ViewPageTemplateFile('templates/submit_review.pt')
     schema = ISubmitReview
-    ignoreContext = True
 
     def __init__(self, request, context):
         super(SubmitReview, self).__init__(request, context)
@@ -62,10 +51,8 @@ class SubmitReview(AutoExtensibleForm, Form):
     def getContent(self):
         content = {}
 
-        reviewer = self.request.get('form.widgets.reviewer', None)
-        if reviewer:
-            content['reviewer'] = reviewer
-
+        reviewer = api.get_current()
+        import pdb; pdb.set_trace()
         annotation = self.annotations.get(SUBMIT_REVIEW_KEY, None)
         if annotation and reviewer in annotation:
             content.update(annotation[reviewer])
@@ -108,12 +95,16 @@ class SubmitReview(AutoExtensibleForm, Form):
 
         if IMasterReviewerMarker.providedBy(self.context) and \
            self.context.master_reviewer == data['reviewer']:
-            api.content.transition(self.context, exit[workflow_id])
+            with api.env.adopt_roles(['Manager']):
+                api.content.transition(self.context, exit[workflow_id])
 
         elif len(self.annotations[SUBMIT_REVIEW_KEY]) ==\
                 len(self.context.reviewers):
 
             if IMasterReviewerMarker.providedBy(self.context):
+                self.context.manage_setLocalRoles(
+                    self.context.master_reviewer, ["Reader"])
+
                 recipient = api.user.get(self.context.master_reviewer)
                 recipient_email = recipient.getProperty('email')
                 if recipient_email:
@@ -129,7 +120,8 @@ class SubmitReview(AutoExtensibleForm, Form):
                             **email_param(self.context, recipient)),
                         )
             else:
-                api.content.transition(self.context, exit[workflow_id])
+                with api.env.adopt_roles(['Manager']):
+                    api.content.transition(self.context, exit[workflow_id])
 
         messages = IStatusMessage(self.request)
         messages.add(_(u"Review submitted."), type=u"info")

@@ -1,6 +1,7 @@
 from Products.CMFPlone.utils import getToolByName
 from Products.Five.utilities.marker import mark
 from Products.Five.utilities.marker import erase
+from collective.behavior.peerreview.behaviors import IMasterReviewerMarker
 from plone import api
 from plone.registry.interfaces import IRegistry
 from zope.component import getUtility
@@ -42,6 +43,8 @@ def notify_reviewers(context, event):
         mark(context, IReviewInProgress)
 
         for reviewer in context.reviewers:
+            context.manage_setLocalRoles(reviewer, ["Reader"])
+
             recipient = api.user.get(reviewer)
             recipient_email = recipient.getProperty('email')
             if recipient_email:
@@ -62,6 +65,12 @@ def notify_reviewers(context, event):
        IReviewInProgress.providedBy(context):
 
         erase(context, IReviewInProgress)
+
+        for reviewer in context.reviewers:
+            context.manage_delLocalRoles([reviewer])
+
+        if IMasterReviewerMarker.providedBy(context):
+            context.manage_delLocalRoles([context.master_reviewer])
 
         recipient = api.user.get(context.Creator())
         recipient_email = recipient.getProperty('email')
