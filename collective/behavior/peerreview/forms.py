@@ -52,7 +52,7 @@ class SubmitReview(AutoExtensibleForm, Form):
         content = {}
 
         reviewer = api.get_current()
-        import pdb; pdb.set_trace()
+        # import pdb; pdb.set_trace()
         annotation = self.annotations.get(SUBMIT_REVIEW_KEY, None)
         if annotation and reviewer in annotation:
             content.update(annotation[reviewer])
