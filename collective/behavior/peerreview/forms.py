@@ -5,7 +5,6 @@ from collective.behavior.peerreview import MessageFactory as _
 from collective.behavior.peerreview.behaviors import IMasterReviewerMarker
 from collective.behavior.peerreview.subscribers import IReviewInProgress
 from collective.behavior.peerreview.subscribers import email_param
-from copy import deepcopy
 from persistent.dict import PersistentDict
 from plone import api
 from plone.app.widgets.dx import TinyMCEWidget
@@ -21,6 +20,9 @@ from zope.annotation.interfaces import IAnnotations
 from zope.component import getUtility
 
 SUBMIT_REVIEW_KEY = 'collective.behaviour.peerreview.forms.SubmitReview'
+EMAILS_SUBJECT = 'collective.behavior.peerreview.emails.subject'
+EMAILS_BODY = 'collective.behavior.peerreview.emails.body'
+EXIT_TRANSITION = 'collective.behavior.peerreview.exit'
 
 
 class ISubmitReview(model.Schema):
@@ -48,20 +50,21 @@ class SubmitReview(AutoExtensibleForm, Form):
             self.annotations[SUBMIT_REVIEW_KEY] = PersistentDict()
 
     @instance.memoize
+    def getReviewer(self):
+        reviewer = api.user.get_current()
+        return reviewer.getUserId()
+
+    @instance.memoize
     def getContent(self):
-        content = {}
-
-        reviewer = api.get_current()
-        # import pdb; pdb.set_trace()
-        annotation = self.annotations.get(SUBMIT_REVIEW_KEY, None)
-        if annotation and reviewer in annotation:
-            content.update(annotation[reviewer])
-
+        content, reviewer = {}, self.getReviewer()
+        annotation = self.annotations[SUBMIT_REVIEW_KEY]
+        if reviewer in annotation:
+            content = annotation[reviewer]
         return content
 
     def update(self):
         super(SubmitReview, self).update()
-        reviewer = self.request.get('form.widgets.reviewer', None)
+        reviewer = self.getReviewer()
         if IMasterReviewerMarker.providedBy(self.context):
             self.is_reviewer = reviewer in self.context.reviewers or\
                 reviewer == self.context.master_reviewer
@@ -76,30 +79,29 @@ class SubmitReview(AutoExtensibleForm, Form):
         if errors and not self.is_review_in_progress:
             return
 
+        reviewer = self.getReviewer()
         registry = getUtility(IRegistry)
+        annotation = self.annotations[SUBMIT_REVIEW_KEY]
+        annotation[reviewer] = PersistentDict(data)
 
-        new_data = deepcopy(data)
-        del new_data['reviewer']
-        self.annotations[SUBMIT_REVIEW_KEY][data['reviewer']] = \
-            PersistentDict(new_data)
+        emails_subject = registry.get(EMAILS_SUBJECT, {})
+        emails_body = registry.get(EMAILS_BODY, {})
+        exit_transition = registry.get(EXIT_TRANSITION, None)
 
-        emails_subject = registry.get(
-            'collective.behavior.peerreview.emails.subject', {})
-        emails_body = registry.get(
-            'collective.behavior.peerreview.emails.body', {})
-        exit = registry.get('collective.behavior.peerreview.exit', None)
+        subject = emails_subject.get('review_started_notify_reviewers', '')
+        body = emails_body.get('review_started_notify_reviewers', '')
 
         workflow_tool = getToolByName(self.context, 'portal_workflow')
         workflow = workflow_tool.getWorkflowsFor(self.context)[0]
         workflow_id = workflow.getId()
 
         if IMasterReviewerMarker.providedBy(self.context) and \
-           self.context.master_reviewer == data['reviewer']:
+           self.context.master_reviewer == reviewer:
             with api.env.adopt_roles(['Manager']):
-                api.content.transition(self.context, exit[workflow_id])
+                api.content.transition(
+                    self.context, exit_transition[workflow_id])
 
-        elif len(self.annotations[SUBMIT_REVIEW_KEY]) ==\
-                len(self.context.reviewers):
+        elif len(annotation) == len(self.context.reviewers):
 
             if IMasterReviewerMarker.providedBy(self.context):
                 self.context.manage_setLocalRoles(
@@ -108,10 +110,6 @@ class SubmitReview(AutoExtensibleForm, Form):
                 recipient = api.user.get(self.context.master_reviewer)
                 recipient_email = recipient.getProperty('email')
                 if recipient_email:
-                    subject = emails_subject.get(
-                        'review_started_notify_reviewers', '')
-                    body = emails_body.get(
-                        'review_started_notify_reviewers', '')
                     api.portal.send_email(
                         recipient=recipient_email,
                         subject=subject.format(
@@ -121,7 +119,8 @@ class SubmitReview(AutoExtensibleForm, Form):
                         )
             else:
                 with api.env.adopt_roles(['Manager']):
-                    api.content.transition(self.context, exit[workflow_id])
+                    api.content.transition(
+                        self.context, exit_transition[workflow_id])
 
         messages = IStatusMessage(self.request)
         messages.add(_(u"Review submitted."), type=u"info")

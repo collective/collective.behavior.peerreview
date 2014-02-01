@@ -46,7 +46,10 @@ def notify_reviewers(context, event):
             context.manage_setLocalRoles(reviewer, ["Reader"])
 
             recipient = api.user.get(reviewer)
-            recipient_email = recipient.getProperty('email')
+            recipient_email = None
+            if recipient:
+                recipient_email = recipient.getProperty('email')
+
             if recipient_email:
                 subject = emails_subject.get(
                     'review_started_notify_reviewers', '')
