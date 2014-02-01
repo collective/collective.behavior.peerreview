@@ -2,7 +2,7 @@ from Products.CMFPlone.utils import getToolByName
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.statusmessages.interfaces import IStatusMessage
 from collective.behavior.peerreview import MessageFactory as _
-from collective.behavior.peerreview.behaviors import IMasterReviewerMarker
+from collective.behavior.peerreview.behaviors import ILeadReviewerMarker
 from collective.behavior.peerreview.subscribers import IReviewInProgress
 from collective.behavior.peerreview.subscribers import email_param
 from persistent.dict import PersistentDict
@@ -65,11 +65,11 @@ class SubmitReview(AutoExtensibleForm, Form):
     def update(self):
         super(SubmitReview, self).update()
         reviewer = self.getReviewer()
-        if IMasterReviewerMarker.providedBy(self.context):
-            self.is_reviewer = reviewer in self.context.reviewers or\
-                reviewer == self.context.master_reviewer
+        if ILeadReviewerMarker.providedBy(self.context):
+            self.is_reviewer = reviewer in self.context.peer_reviewers or\
+                reviewer == self.context.lead_reviewer
         else:
-            self.is_reviewer = reviewer in self.context.reviewers
+            self.is_reviewer = reviewer in self.context.peer_reviewers
         self.is_review_in_progress = IReviewInProgress.providedBy(self.context)
 
     @buttonAndHandler(u'Submit')
@@ -95,15 +95,15 @@ class SubmitReview(AutoExtensibleForm, Form):
         workflow = workflow_tool.getWorkflowsFor(self.context)[0]
         workflow_id = workflow.getId()
 
-        if IMasterReviewerMarker.providedBy(self.context) and \
+        if ILeadReviewerMarker.providedBy(self.context) and \
            self.context.master_reviewer == reviewer:
             with api.env.adopt_roles(['Manager']):
                 api.content.transition(
                     self.context, exit_transition[workflow_id])
 
-        elif len(annotation) == len(self.context.reviewers):
+        elif len(annotation) == len(self.context.peer_reviewers):
 
-            if IMasterReviewerMarker.providedBy(self.context):
+            if ILeadReviewerMarker.providedBy(self.context):
                 self.context.manage_setLocalRoles(
                     self.context.master_reviewer, ["Reader"])
 

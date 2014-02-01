@@ -23,59 +23,57 @@
         />
 
     <plone:behavior
-        title="Reviewers"
+        title="Peer Reviewers"
         description="Behavior which enables peer review process."
-        provides=".behaviors.IReviewers"
-        factory=".behaviors.Reviewers"
-        marker=".behaviors.IReviewersMarker"
+        provides=".behaviors.IPeerReviewers"
+        factory=".behaviors.PeerReviewers"
+        marker=".behaviors.IPeerReviewersMarker"
         />
 
     <plone:behavior
-        title="Master reviewer"
-        description="Extension of 'Reviewers' behavior which enables one master reviewer which submits review at the end."
-        provides=".behaviors.IMasterReviewer"
-        factory=".behaviors.MasterReviewer"
-        marker=".behaviors.IMasterReviewerMarker"
+        title="Lead reviewer"
+        description="Extension of 'Reviewers' behavior which enables one lead reviewer which submits review at the end."
+        provides=".behaviors.ILeadReviewer"
+        factory=".behaviors.LeadReviewer"
+        marker=".behaviors.ILeadReviewerMarker"
         />
 
     <subscriber
-        for=".behaviors.IReviewersMarker
+        for=".behaviors.IPeerReviewersMarker
              Products.CMFCore.interfaces.IActionSucceededEvent"
         handler=".subscribers.notify_reviewers"
         />
 
     <browser:viewlet
         name="collective.behavior.peerreview.status"
-        for=".behaviors.IReviewersMarker"
+        for=".behaviors.IPeerReviewersMarker"
         class=".viewlets.ReviewStatus"
         permission="zope2.View"
         manager="plone.app.layout.viewlets.interfaces.IAboveContentBody"
         />
 
     <browser:page
-        for=".behaviors.IReviewersMarker"
+        for=".behaviors.IPeerReviewersMarker"
         name="submit-review"
         class=".forms.SubmitReview"
         permission="collective.behavior.peerreview.SubmitReview"
         />
 
     <!-- TODO:
-       - tests
+       - Possible to "Save without Submit", "Submit", "Cancel"
+       - Master reviewer should be possible to retract the document review
+       - Master reviewer and reviewers should be enable to discuss
+       - Master reviewer should be possible to complete button
+       - Master reviewer group per workflow
+       - add integrational tests
        - anybody with ManageReviewers permission can see viewlet
+       - add prepare transition
        -  my reviews: should it be in dashboard?
        -  all reviews page: where should we place it? 
        -  cofiglet (workflow <-> enter/exit transition)
        -  cofiglet (email templates) 
-       - should it possible to save review and submit it later? yes
        - auto-assign reviewers or manually first? later
-       - rename master reviewer => lead reviewer and reviewers => peer reviewers
-       - Master reviewer should be possible to retract the document review
-       - Master reviewer and reviewers should be enable to discuss
-       - Master reviewer should be possible to complete button
-       - Possible to "Save without Submit", "Submit", "Cancel"
-       - Master reviewer group per workflow
        - Reviewers group per workflow to select 
-       - add prepare transition
        - robot tests
        - self review possibility
       -->

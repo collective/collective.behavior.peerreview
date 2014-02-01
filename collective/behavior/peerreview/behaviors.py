@@ -12,19 +12,19 @@ from zope.component import adapts
 from zope.interface import alsoProvides, implements, Interface
 
 
-class IReviewers(model.Schema):
-    """Define reviewers field."""
+class IPeerReviewers(model.Schema):
+    """Define peer reviewers field."""
 
-    form.widget('reviewers', AjaxSelectWidget,
+    form.widget('peer_reviewers', AjaxSelectWidget,
                 vocabulary="plone.app.vocabularies.Users",
                 pattern_options={'allowNewItems': True})
-    form.read_permission(reviewers='cmf.ModifyPortalContent')
+    form.read_permission(peer_reviewers='cmf.ModifyPortalContent')
     form.write_permission(
-        reviewers='collective.behavior.peerreview.ManageReviewers')
-    reviewers = schema.Tuple(
-        title=_(u'label_reviewers', u'Reviewers'),
+        peer_reviewers='collective.behavior.peerreview.ManageReviewers')
+    peer_reviewers = schema.Tuple(
+        title=_(u'label_peer_reviewers', u'Peer reviewers'),
         description=_(
-            u'help_reviewers',
+            u'help_peer_reviewers',
             default=u"Persons responsible for reviewing this document."
         ),
         value_type=schema.TextLine(),
@@ -33,22 +33,22 @@ class IReviewers(model.Schema):
     )
 
 
-class IReviewersMarker(Interface):
+class IPeerReviewersMarker(Interface):
     """Marker interface."""
 
 
-class IMasterReviewer(model.Schema):
+class ILeadReviewer(model.Schema):
     """Define reviewers field."""
 
-    form.widget('master_reviewer', SelectWidget,
+    form.widget('lead_reviewer', SelectWidget,
                 vocabulary="plone.app.vocabularies.Users")
-    form.read_permission(master_reviewer='cmf.ModifyPortalContent')
+    form.read_permission(lead_reviewer='cmf.ModifyPortalContent')
     form.write_permission(
-        master_reviewer='collective.behavior.peerreview.ManageReviewers')
-    master_reviewer = schema.Choice(
-        title=_(u'label_master_reviewer', u'Master reviewer'),
+        lead_reviewer='collective.behavior.peerreview.ManageReviewers')
+    lead_reviewer = schema.Choice(
+        title=_(u'label_lead_reviewer', u'Lead reviewer'),
         description=_(
-            u'help_master_reviewer',
+            u'help_lead_reviewer',
             default=u"Person responsible finishing review process."
         ),
         vocabulary="plone.app.vocabularies.Users",
@@ -56,35 +56,35 @@ class IMasterReviewer(model.Schema):
     )
 
 
-class IMasterReviewerMarker(IReviewersMarker):
+class ILeadReviewerMarker(IPeerReviewersMarker):
     """Marker interface."""
 
 
-alsoProvides(IReviewers, IFormFieldProvider)
-alsoProvides(IMasterReviewer, IFormFieldProvider)
+alsoProvides(IPeerReviewers, IFormFieldProvider)
+alsoProvides(ILeadReviewer, IFormFieldProvider)
 
 
-class Reviewers(object):
+class PeerReviewers(object):
     """
     """
 
-    implements(IReviewers)
+    implements(IPeerReviewers)
     adapts(IDexterityContent)
 
     def __init__(self, context):
         self.context = context
 
-    reviewers = context_property('reviewers')
+    peer_reviewers = context_property('peer_reviewers')
 
 
-class MasterReviewer(object):
+class LeadReviewer(object):
     """
     """
 
-    implements(IMasterReviewer)
+    implements(ILeadReviewer)
     adapts(IDexterityContent)
 
     def __init__(self, context):
         self.context = context
 
-    master_reviewer = context_property('master_reviewer')
+    lead_reviewer = context_property('lead_reviewer')

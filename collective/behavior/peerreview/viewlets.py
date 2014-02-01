@@ -1,7 +1,7 @@
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from plone import api
 from plone.app.layout.viewlets.common import ViewletBase
-from collective.behavior.peerreview.form import SUBMIT_REVIEW_KEY
+from collective.behavior.peerreview.forms import SUBMIT_REVIEW_KEY
 from collective.behavior.peerreview.subscribers import IReviewInProgress
 from zope.annotation.interfaces import IAnnotations
 
@@ -13,10 +13,10 @@ class ReviewStatus(ViewletBase):
     def update(self):
         self.is_owner = False
         self.is_reviewer = False
-        self.current_user = api.user.get_current().getUserName()
+        self.current_user = api.user.get_current().getUserId()
         if self.current_user == self.context.Creator():
             self.is_owner = True
-        elif self.current_user in self.context.reviewers or \
+        elif self.current_user in self.context.peer_reviewers or \
                 self.current_user == self.context.master_reviewer:
             self.is_reviewer = IReviewInProgress.providedBy(self.context)
 
@@ -27,5 +27,4 @@ class ReviewStatus(ViewletBase):
                 self.reviews = annotations[SUBMIT_REVIEW_KEY]
 
     def submit_review_url(self):
-        return '{}/@@submit-review?form.widgets.reviewer={}'.format(
-            self.context.absolute_url(), self.current_user)
+        return '{}/@@submit-review'.format(self.context.absolute_url())
